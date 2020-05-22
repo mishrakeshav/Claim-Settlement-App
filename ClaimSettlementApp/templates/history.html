@@ -19,10 +19,12 @@
               <td>{{ application.id }}</td>
               <td>{{ application.claim_type }}</td>
               <td>{{ application.date_applied}}</td>
-              {% if application.approved %}
+              {% if application.approved  == 1%}
                 <td><i class="large material-icons">check</i></td>
-              {% else %}
+              {% elif application.approved == 0 %}
                 <td><i class="large material-icons">access_time</i></td>
+              {% else %}
+              <td class="color:'red';"><i class="large material-icons">close</i></td>
               {% endif %}
             </tr>
           {% endfor %}

@@ -17,7 +17,7 @@
           </thead>
           <tbody>
             {% for claim in claims %}
-              {% if claim.approved != 2 %}
+              
               <tr>
                 <td><a >{{ claim.id }}</a></td>
                 <td>{{ claim.claim_type }}</td>
@@ -29,11 +29,13 @@
                      <button class = 'pt-1' style="width: 100px;"><i class="large material-icons">access_time</i></button> 
                     </a>
                   </td>
-                {% else %}
+                {% elif claim.approved == 1 %}
                   <td><i class="large material-icons">check</i></td>
+                {% else %}
+                  <td><i class="large material-icons">close</i></td>
                 {% endif %}
               </tr>
-              {% endif %}
+              
             {% endfor %}
 
             

@@ -24,7 +24,9 @@ from flask_login import login_user, current_user, logout_user, login_required
 
 
 
-###########################################################
+###################### Utils ###########################
+
+
 def only_admins(func):
     @functools.wraps(func)
     def function_that_runs_func():
@@ -48,7 +50,6 @@ def save_picture(form_picture):
     
     return picture_fn
 ###########################################################
-
 
 @app.route("/login",methods = ['GET','POST'])
 def login():
@@ -106,51 +107,59 @@ def claims():
     return render_template('claims_list.html', claims = claims)
 
 @app.route("/claims/<string:type_of_claim>/<int:claim_id>/<int:claim>")
+@login_required
 def view_claim(type_of_claim,claim_id,claim):
-    if type_of_claim == "Extended Working Hours":
-        mapped = Claims.query.filter_by(id = claim).first()
-        user = User.query.filter_by(id = mapped.user_id).first()
-        clients_claim = ExtendedHoursClaim.query.filter_by(id = claim_id).first()
-    elif type_of_claim == "Local Conveyance":
-        mapped = Claims.query.filter_by(id = claim).first()
-        user = User.query.filter_by(id = mapped.user_id).first()
-        clients_claim = LocalConveyanceClaim.query.filter_by(id = claim_id).first()
-    elif type_of_claim == "Client Entertainment":
-        mapped = Claims.query.filter_by(id = claim).first()
-        user = User.query.filter_by(id = mapped.user_id).first()
-        clients_claim = ClientEntertainmentClaim.query.filter_by(id = claim_id).first()
-    elif type_of_claim == "Office Expenses":
-        mapped = Claims.query.filter_by(id = claim).first()
-        user = User.query.filter_by(id = mapped.user_id).first()
-        clients_claim = OfficeExpensesClaim.query.filter_by(id = claim_id).first()
-
-    return render_template('display_claim.html',user = user, mapped = mapped, clients_claim = clients_claim )
+    if current_user.isAdmin:
+        if type_of_claim == "Extended Working Hours":
+            mapped = Claims.query.filter_by(id = claim).first()
+            user = User.query.filter_by(id = mapped.user_id).first()
+            clients_claim = ExtendedHoursClaim.query.filter_by(id = claim_id).first()
+        elif type_of_claim == "Local Conveyance":
+            mapped = Claims.query.filter_by(id = claim).first()
+            user = User.query.filter_by(id = mapped.user_id).first()
+            clients_claim = LocalConveyanceClaim.query.filter_by(id = claim_id).first()
+        elif type_of_claim == "Client Entertainment":
+            mapped = Claims.query.filter_by(id = claim).first()
+            user = User.query.filter_by(id = mapped.user_id).first()
+            clients_claim = ClientEntertainmentClaim.query.filter_by(id = claim_id).first()
+        elif type_of_claim == "Office Expenses":
+            mapped = Claims.query.filter_by(id = claim).first()
+            user = User.query.filter_by(id = mapped.user_id).first()
+            clients_claim = OfficeExpensesClaim.query.filter_by(id = claim_id).first()
+        return render_template('display_claim.html',user = user, mapped = mapped, clients_claim = clients_claim )
+    else:
+        return "URL NOT FOUND"
 
 @app.route("/claims/<int:approved>/<string:type_of_claim>/<int:claim_id>/<int:claim>")
+@login_required
 def approve_claim(approved, type_of_claim, claim_id, claim):
-    if type_of_claim == "Extended Working Hours":
-        mapped = Claims.query.filter_by(id = claim).first()
+    if current_user.isAdmin:
+        if type_of_claim == "Extended Working Hours":
+            mapped = Claims.query.filter_by(id = claim).first()
+            mapped.approved = approved
+            user = User.query.filter_by(id = mapped.user_id).first()
+            clients_claim = ExtendedHoursClaim.query.filter_by(id = claim_id).first()
+        elif type_of_claim == "Local Conveyance":
+            mapped = Claims.query.filter_by(id = claim).first()
+            user = User.query.filter_by(id = mapped.user_id).first()
+            clients_claim = LocalConveyanceClaim.query.filter_by(id = claim_id).first()
+        elif type_of_claim == "Client Entertainment":
+            mapped = Claims.query.filter_by(id = claim).first()
+            user = User.query.filter_by(id = mapped.user_id).first()
+            clients_claim = ClientEntertainmentClaim.query.filter_by(id = claim_id).first()
+        elif type_of_claim == "Office Expenses":
+            mapped = Claims.query.filter_by(id = claim).first()
+            user = User.query.filter_by(id = mapped.user_id).first()
+            clients_claim = OfficeExpensesClaim.query.filter_by(id = claim_id).first()
         mapped.approved = approved
-        user = User.query.filter_by(id = mapped.user_id).first()
-        clients_claim = ExtendedHoursClaim.query.filter_by(id = claim_id).first()
-    elif type_of_claim == "Local Conveyance":
-        mapped = Claims.query.filter_by(id = claim).first()
-        user = User.query.filter_by(id = mapped.user_id).first()
-        clients_claim = LocalConveyanceClaim.query.filter_by(id = claim_id).first()
-    elif type_of_claim == "Client Entertainment":
-        mapped = Claims.query.filter_by(id = claim).first()
-        user = User.query.filter_by(id = mapped.user_id).first()
-        clients_claim = ClientEntertainmentClaim.query.filter_by(id = claim_id).first()
-    elif type_of_claim == "Office Expenses":
-        mapped = Claims.query.filter_by(id = claim).first()
-        user = User.query.filter_by(id = mapped.user_id).first()
-        clients_claim = OfficeExpensesClaim.query.filter_by(id = claim_id).first()
-    mapped.approved = approved
-    db.session.commit()
-    return redirect(url_for('claims'))
+        db.session.commit()
+        return redirect(url_for('claims'))
+    else:
+        return "URL NOT FOUND"
 
 #######################################################################
-
+#################### END POINTS FOR USER ##############################
+#######################################################################
 @app.route("/claims/apply/extended-working-hours", methods = ['GET', 'POST'])
 @login_required
 def extendedWorkingHours():
@@ -265,3 +274,5 @@ def client_history():
 @login_required
 def profile():
     return render_template('profile.html')
+
+#####################################################################
