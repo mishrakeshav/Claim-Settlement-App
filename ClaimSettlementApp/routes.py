@@ -51,6 +51,10 @@ def save_picture(form_picture):
     return picture_fn
 ###########################################################
 
+@app.route("/")
+def home():
+    return redirect(url_for('login'))
+
 @app.route("/login",methods = ['GET','POST'])
 def login():
     if current_user.is_authenticated:
@@ -103,7 +107,7 @@ def logout():
 @login_required
 @only_admins
 def claims():
-    claims = Claims.query.all()
+    claims = Claims.query.all()[::-1]
     return render_template('claims_list.html', claims = claims)
 
 @app.route("/claims/<string:type_of_claim>/<int:claim_id>/<int:claim>")
